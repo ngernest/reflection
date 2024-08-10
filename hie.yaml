@@ -1,0 +1,9 @@
+cradle:
+  stack:
+    - path: ./test
+      component: "reflection:test:reflection-test"
+    - path: ./src
+      component: "reflection:lib"
+    - path: ./app
+      component: "reflection:exe:reflection-exe"
+
