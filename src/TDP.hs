@@ -128,7 +128,7 @@ instance Rep a => Rep [a] where
 tList :: Rep a => Type [a]
 tList = TIso listIso rep
 
--- | An isomorphicm between `[a]` & `Either () (a, [a])`
+-- | An isomorphism between `[a]` & `Either () (a, [a])`
 listIso :: Rep a => Iso [a] (Either () (a, [a]))
 listIso = Iso t f
   where
@@ -139,6 +139,9 @@ listIso = Iso t f
     f :: Either () (a, [a]) -> [a]
     f (Left ()) = []
     f (Right (x, xs)) = x : xs
+
+--------------------------------------------------------------------------------
+-- A binary version of the `read` and `show` functions
 
 data Bit = O | I deriving (Eq, Show)
 
