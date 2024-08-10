@@ -12,7 +12,6 @@ license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git
@@ -32,6 +31,7 @@ common common-stanza
     , random
     , mtl
     , template-haskell
+    , template-haskell-compat-v0208
   default-language:
     Haskell2010
   default-extensions:
@@ -46,6 +46,7 @@ library
       TDP
       State
       Types2
+      TDP2
       -- if you add modules to your project, list them here
       -- so that they will be available to the executable and test suite
   hs-source-dirs:

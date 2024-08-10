@@ -1,207 +1,207 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-
-{-# HLINT ignore "Use camelCase" #-}
+-- {-# LANGUAGE DeriveDataTypeable #-}
+-- {-# HLINT ignore "Use camelCase" #-}
+-- {-# LANGUAGE ExistentialQuantification #-}
+-- {-# LANGUAGE FlexibleInstances #-}
+-- {-# LANGUAGE GADTs #-}
+-- {-# LANGUAGE InstanceSigs #-}
+-- {-# LANGUAGE RankNTypes #-}
+-- {-# LANGUAGE ScopedTypeVariables #-}
+-- {-# LANGUAGE StandaloneDeriving #-}
+-- {-# LANGUAGE UndecidableInstances #-}
+-- {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 module TDP2 where
 
-import Control.Monad
-import Data.Char
-import Data.Maybe
-import Data.Typeable
-import Test.QuickCheck
-import Types2
+-- body of this file doesn't compile so its commented out for now
 
-class Rep a => Children a where
-  children :: a -> [a]
+-- import Control.Monad ()
+-- import Data.Char
+-- import Data.Maybe
+-- import Data.Typeable
+-- import Test.QuickCheck
+-- import Types2
 
-instance Rep a => Children a where
-  children x = case rep of
-    (TIso iso tb) -> aux tb (to iso x)
-    _ -> []
-    where
-      aux :: Type b -> b -> [a]
-      aux (TEither t1 t2) (Left x) = undefined
-      aux (TEither t1 t2) (Right x) = undefined
-      aux (TProd t1 t2) (x1, x2) = undefined
-      aux (TIso iso tb) x = undefined
-      aux _ x = [] -- base types
+-- class Rep a => Children a where
+--   children :: a -> [a]
 
-data Dynamic = forall a. (Show a) => ToDyn a
+-- data Tree a = E | N (Tree a) a (Tree a)
+--   deriving (Eq, Show)
 
-fromDyn :: Typeable b => Dynamic -> Maybe b
-fromDyn = undefined
+-- deriving instance Typeable Tree
 
-instance Show Dynamic where
-  show (ToDyn d) = "(ToDyn " ++ show d ++ ")"
+-- instance Rep a => Children a where
+--   children :: a -> [a]
+--   children x = case rep of
+--     (TIso iso tb) -> aux tb (to iso x)
+--     _ -> []
+--     where
+--       aux :: Type b -> b -> [a]
+--       aux (TEither t1 t2) (Left x) = aux t1 x
+--       aux (TEither t1 t2) (Right x) = aux t2 x
+--       aux (TProd t1 t2) (x1, x2) = aux t1 x1 ++ aux t1 t2
+--       aux (TIso iso tb) x = undefined
+--       aux _ x = [] -- base types
 
--- a heterogenous list of values
-dynlist = [ToDyn (0 :: Int), ToDyn True, ToDyn "ABC", ToDyn [1 :: Int, 2, 3], ToDyn (4 :: Int)]
+-- data Dynamic = forall a. (Show a) => ToDyn a
 
--- increment the value if it happens to be a number
-incr :: Dynamic -> Dynamic
-incr d = undefined
+-- fromDyn :: Typeable b => Dynamic -> Maybe b
+-- fromDyn = undefined
 
-deriving instance Typeable1 Tree
+-- instance Show Dynamic where
+--   show (ToDyn d) = "(ToDyn " ++ show d ++ ")"
 
-represent ''Bool
-represent ''Maybe
-represent ''[]
+-- -- a heterogenous list of values
+-- dynlist = [ToDyn (0 :: Int), ToDyn True, ToDyn "ABC", ToDyn [1 :: Int, 2, 3], ToDyn (4 :: Int)]
 
-data RoseTree a = Node a [RoseTree a]
-  deriving (Eq, Show, Typeable)
+-- -- increment the value if it happens to be a number
+-- incr :: Dynamic -> Dynamic
+-- incr d = undefined
 
-represent ''RoseTree
+-- data RoseTree a = Node a [RoseTree a]
+--   deriving (Eq, Show, Typeable)
 
-roseTree :: RoseTree Int
-roseTree = (Node 1 [Node 2 [Node 5 [Node 6 [], Node 7 []]], Node 3 [], Node 4 []])
+-- roseTree :: RoseTree Int
+-- roseTree = Node 1 [Node 2 [Node 5 [Node 6 [], Node 7 []]], Node 3 [], Node 4 []]
 
-class Rep a => Universe a where
-  universe :: a -> [a]
+-- class Rep a => Universe a where
+--   universe :: a -> [a]
 
-instance Rep a => Universe a where
-  universe x = undefined
-    where
-      aux :: Type b -> b -> [a]
-      aux (TEither t1 t2) (Left x) = aux t1 x
-      aux (TEither t1 t2) (Right x) = aux t2 x
-      aux (TProd t1 t2) (x1, x2) = aux t1 x1 ++ aux t2 x2
-      aux (TIso iso tb) x = undefined
-      aux _ x = []
+-- instance Rep a => Universe a where
+--   universe x = undefined
+--     where
+--       aux :: Type b -> b -> [a]
+--       aux (TEither t1 t2) (Left x) = aux t1 x
+--       aux (TEither t1 t2) (Right x) = aux t2 x
+--       aux (TProd t1 t2) (x1, x2) = aux t1 x1 ++ aux t2 x2
+--       aux (TIso iso tb) x = case cast x of
+--         Just y -> [y]
+--         Nothing -> aux tb (to iso x)
+--       aux _ x = []
 
-example_universe = universe (N (N E 'a' E) 'b' (N E 'c' E))
+-- example_universe = universe (N (N E 'a' E) 'b' (N E 'c' E))
 
-example_u_rost =
-  universe
-    ( Node
-        'a'
-        [ Node 'b' [],
-          Node 'c' [],
-          Node 'd' [Node 'e' [], Node 'f' []]
-        ]
-    )
+-- example_u_rost =
+--   universe
+--     ( Node
+--         'a'
+--         [ Node 'b' [],
+--           Node 'c' [],
+--           Node 'd' [Node 'e' [], Node 'f' []]
+--         ]
+--     )
 
-data Bop = Plus | Times | Minus | Div
-  deriving (Eq, Show, Typeable)
+-- data Bop = Plus | Times | Minus | Div
+--   deriving (Eq, Show, Typeable)
 
-represent ''Bop
+-- data Expr
+--   = Var String
+--   | Val Int
+--   | Op Bop Expr Expr
+--   deriving (Eq, Show, Typeable)
 
-data Expr
-  = Var String
-  | Val Int
-  | Op Bop Expr Expr
-  deriving (Eq, Show, Typeable)
+-- vars :: Expr -> [String]
+-- vars x = [s | Var s <- universe x]
 
-represent ''Expr
+-- example_vars =
+--   vars (Op Minus (Op Plus (Var "X") (Var "Y")) (Var "Z"))
 
-vars :: Expr -> [String]
-vars x = [s | Var s <- universe x]
+-- lowerCaseVars :: Expr -> Bool
+-- lowerCaseVars x = any (isLower . head) [v | (Var v) <- universe x]
 
-example_vars =
-  vars (Op Minus (Op Plus (Var "X") (Var "Y")) (Var "Z"))
+-- countDivZero :: Expr -> Int
+-- countDivZero x =
+--   length
+--     [ ()
+--       | Op Div _ (Val 0) <- universe x
+--     ]
 
-lowerCaseVars :: Expr -> Bool
-lowerCaseVars x = any (isLower . head) [v | (Var v) <- universe x]
+-- class Rep a => Transform a where
+--   transform :: (a -> a) -> a -> a
 
-countDivZero :: Expr -> Int
-countDivZero x =
-  length
-    [ ()
-      | Op Div _ (Val 0) <- universe x
-    ]
+-- instance Rep a => Transform a where
+--   transform f x =
+--     f
+--       ( case rep of
+--           (TIso iso tb) -> from iso (aux tb (to iso x))
+--           _ -> x
+--       )
+--     where
+--       aux :: Type b -> b -> b
+--       aux (TEither t1 t2) (Left x) = Left (aux t1 x)
+--       aux (TEither t1 t2) (Right x) = Right (aux t2 x)
+--       aux (TProd t1 t2) (x1, x2) = (aux t1 x1, aux t2 x2)
+--       aux (TIso iso tb) x = apply f (from iso (aux tb (to iso x)))
+--       aux _ x = x
 
-class Rep a => Transform a where
-  transform :: (a -> a) -> a -> a
+-- apply :: (a -> a) -> b -> b
+-- apply f x = undefined
 
-instance Rep a => Transform a where
-  transform f x =
-    f
-      ( case rep of
-          (TIso iso tb) -> from iso (aux tb (to iso x))
-          _ -> x
-      )
-    where
-      aux :: Type b -> b -> b
-      aux (TEither t1 t2) (Left x) = Left (aux t1 x)
-      aux (TEither t1 t2) (Right x) = Right (aux t2 x)
-      aux (TProd t1 t2) (x1, x2) = (aux t1 x1, aux t2 x2)
-      aux (TIso iso tb) x = apply f (from iso (aux tb (to iso x)))
-      aux _ x = x
+-- constVal :: Expr -> Expr
+-- constVal (Op Plus (Val i) (Val j)) = Val (i + j)
+-- constVal (Op Times (Val i) (Val j)) = Val (i * j)
+-- constVal (Op Minus (Val i) (Val j)) = Val (i - j)
+-- constVal (Op Div (Val i) (Val j)) | j /= 0 = Val (i `div` j)
+-- constVal e = e
 
-apply :: (a -> a) -> b -> b
-apply f x = undefined
+-- t1 = transform constVal (Op Plus (Val 1) (Op Times (Val 2) (Val 3)))
 
-constVal :: Expr -> Expr
-constVal (Op Plus (Val i) (Val j)) = Val (i + j)
-constVal (Op Times (Val i) (Val j)) = Val (i * j)
-constVal (Op Minus (Val i) (Val j)) = Val (i - j)
-constVal (Op Div (Val i) (Val j)) | j /= 0 = Val (i `div` j)
-constVal e = e
+-- t2 =
+--   transform
+--     constVal
+--     ( Op
+--         Plus
+--         (Var "x")
+--         (Op Times (Val 2) (Val 3))
+--     )
 
-t1 = transform constVal (Op Plus (Val 1) (Op Times (Val 2) (Val 3)))
+-- plusZero (Op Plus e (Val 0)) = e
+-- plusZero (Op Plus (Val 0) e) = e
+-- plusZero e = e
 
-t2 =
-  transform
-    constVal
-    ( Op
-        Plus
-        (Var "x")
-        (Op Times (Val 2) (Val 3))
-    )
+-- timesZero (Op Times e (Val 0)) = Val 0
+-- timesZero (Op Times (Val 0) e) = Val 0
+-- timesZero e = e
 
-plusZero (Op Plus e (Val 0)) = e
-plusZero (Op Plus (Val 0) e) = e
-plusZero e = e
+-- timesOne (Op Times e (Val 1)) = e
+-- timesOne (Op Times (Val 1) e) = e
+-- timesOne e = e
 
-timesZero (Op Times e (Val 0)) = Val 0
-timesZero (Op Times (Val 0) e) = Val 0
-timesZero e = e
+-- transformExpr =
+--   transform plusZero
+--     . transform timesZero
+--     . transform timesOne
+--     . transform constVal
 
-timesOne (Op Times e (Val 1)) = e
-timesOne (Op Times (Val 1) e) = e
-timesOne e = e
+-- t3 = transformExpr (Op Plus (Var "x") (Op Times (Var "y") (Val 0)))
 
-transformExpr =
-  transform plusZero
-    . transform timesZero
-    . transform timesOne
-    . transform constVal
+-- data Statement
+--   = Assign String Expr
+--   | While Expr Statement
+--   | If Expr Statement Statement
+--   | Sequence Statement Statement
+--   | Skip
+--   deriving (Eq, Show, Typeable)
 
-t3 = transformExpr (Op Plus (Var "x") (Op Times (Var "y") (Val 0)))
+-- class Rep a => GTransform a where
+--   gtransform :: Typeable b => (b -> b) -> a -> a
 
-data Statement
-  = Assign String Expr
-  | While Expr Statement
-  | If Expr Statement Statement
-  | Sequence Statement Statement
-  | Skip
-  deriving (Eq, Show, Typeable)
+-- instance Rep a => GTransform a where
+--   gtransform f x = apply f (aux rep x)
+--     where
+--       aux :: Type b -> b -> b
+--       aux (TEither t1 t2) (Left x1) = Left (aux t1 x1)
+--       aux (TEither t1 t2) (Right x2) = Right (aux t2 x2)
+--       aux (TProd t1 t2) (x1, x2) = (aux t1 x1, aux t2 x2)
+--       aux (TIso iso tb) x =
+--         apply f (from iso (aux tb (to iso x)))
+--       aux _ x = x
 
-represent ''Statement
+-- transformStmt :: Statement -> Statement
+-- transformStmt = gtransform (plusZero . timesZero)
 
-class Rep a => GTransform a where
-  gtransform :: Typeable b => (b -> b) -> a -> a
-
-instance Rep a => GTransform a where
-  gtransform f x = apply f (aux rep x)
-    where
-      aux :: Type b -> b -> b
-      aux (TEither t1 t2) (Left x1) = Left (aux t1 x1)
-      aux (TEither t1 t2) (Right x2) = Right (aux t2 x2)
-      aux (TProd t1 t2) (x1, x2) = (aux t1 x1, aux t2 x2)
-      aux (TIso iso tb) x =
-        apply f (from iso (aux tb (to iso x)))
-      aux _ x = x
-
-transformStmt :: Statement -> Statement
-transformStmt = gtransform (plusZero . timesZero)
-
-t4 =
-  transformStmt
-    ( Assign
-        "x"
-        (Op Plus (Var "x") (Op Times (Var "y") (Val 0)))
-    )
+-- t4 =
+--   transformStmt
+--     ( Assign
+--         "x"
+--         (Op Plus (Var "x") (Op Times (Var "y") (Val 0)))
+--     )
