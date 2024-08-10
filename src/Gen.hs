@@ -1,9 +1,9 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
+{-# HLINT ignore "Use camelCase" #-}
+{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-
-{-# HLINT ignore "Use camelCase" #-}
 
 module Gen where
 
@@ -44,9 +44,8 @@ genExpr t = case t of
   TyInt -> Lit <$> arbitrary
   TyBool ->
     oneof
-      [ Is_Empty <$> (genExpr TySet),
+      [ Is_Empty <$> genExpr TySet,
         Member <$> genExpr TyInt <*> genExpr TySet
-        -- , Lit <$> arbitrary
       ]
   TySet -> oneof [return Empty, Insert <$> genExpr TyInt <*> genExpr TySet]
 
@@ -57,6 +56,7 @@ data Some f where
 deriving instance Show (Some f)
 
 instance Arbitrary (Some Expr) where
+  arbitrary :: Gen (Some Expr)
   arbitrary = do
     st <- genTy
     case st of
