@@ -1,4 +1,4 @@
-# Type-based reflection
+# Experiments with Type-based Reflection
 
 A repo to experiment with type-based reflection in Haskell. 
 

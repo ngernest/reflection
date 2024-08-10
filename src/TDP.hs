@@ -67,9 +67,6 @@ example =
       (3, ('a', True))
       (4, ('a', True))
 
--- >>> example
--- False
-
 instance Rep Bool where rep = tBool
 
 -- | We turn all representable types into equality types
